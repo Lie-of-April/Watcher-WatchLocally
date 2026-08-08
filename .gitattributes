@@ -1,0 +1,26 @@
+# 仓库内统一以 LF 存储文本文件，避免 Windows/macOS/Linux 之间出现整文件 diff
+* text=auto eol=lf
+
+# Windows 脚本必须是 CRLF，否则可能无法执行
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# 二进制文件：禁止任何换行符转换
+*.png  binary
+*.ico  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.bmp  binary
+*.mp4  binary
+*.webm binary
+*.exe  binary
+*.dll  binary
+*.zip  binary
+*.7z   binary
+
+# GitHub 语言统计：不把锁文件和构建产物算进语言占比
+package-lock.json linguist-generated=true
+dist/**           linguist-generated=true

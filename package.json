@@ -1,0 +1,65 @@
+{
+  "name": "watcher",
+  "productName": "Watcher",
+  "version": "0.1.0-alpha",
+  "description": "以图片/视频/GIF浏览为核心的本地媒体资源管理器",
+  "main": "electron/main.js",
+  "author": "XHYender",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k -n VITE,ELECTRON -c cyan,magenta \"vite\" \"wait-on tcp:5199 && cross-env NODE_ENV=development electron .\"",
+    "build": "vite build",
+    "preview": "vite build && electron .",
+    "start": "electron .",
+    "dist": "vite build && electron-builder --win"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
+    "cross-env": "^7.0.3",
+    "electron": "^33.2.0",
+    "electron-builder": "^26.15.3",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "icon": "assets/icon.ico",
+    "appId": "com.watcher.mediamanager",
+    "productName": "Watcher",
+    "compression": "store",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "executableName": "Watcher",
+      "artifactName": "${productName}-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "deleteAppDataOnUninstall": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": false,
+      "warningsAsErrors": false
+    }
+  }
+}

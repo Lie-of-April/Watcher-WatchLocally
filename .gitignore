@@ -1,0 +1,26 @@
+# 依赖
+node_modules/
+
+# 构建产物（均可由 `npm run build` / `npm run dist` 重建）
+dist/
+release/
+
+# 临时构建残留（验证构建时误生成）
+dist_verify_*/
+dist_v*/
+.build_tmp/
+
+# 日志
+*.log
+npm-debug.log*
+*.tsbuildinfo
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# 本地项目状态（WorkBuddy 助理记忆，不入库）
+.workbuddy/
