@@ -12,6 +12,9 @@ const api = {
     close: () => invoke('win:close'),
     isMaximized: () => invoke('win:isMaximized'),
     toggleFullscreen: () => invoke('win:toggleFullscreen'),
+    setMinSize: (width, height) => invoke('win:setMinSize', { width, height }),
+    getSize: () => invoke('win:getSize'),
+    setSize: (width, height) => invoke('win:setSize', { width, height }),
     onState: (cb) => {
       const h = (_e, s) => cb(s)
       ipcRenderer.on('window:state', h)

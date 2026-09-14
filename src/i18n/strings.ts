@@ -238,6 +238,7 @@ const STRINGS: Record<string, string> = {
   'viewer.fitWindow': '适应窗口 (0)',
   'viewer.horizMode': '横向模式（滚轮左右切图，Ctrl+滚轮缩放）',
   'viewer.mangaMode': '漫画模式（纵向无缝滚动，记忆阅读进度）',
+  'viewer.borderless': '无边框模式（隐藏工具栏，ESC 退出）',
   'viewer.favTitle': '收藏 (F)',
   'viewer.infoTitle': '信息面板 (I)',
   'viewer.deleteTitle': '删除 (Delete)',

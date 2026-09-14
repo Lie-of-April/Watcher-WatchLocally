@@ -936,6 +936,9 @@ body.col-resizing .sidebar {
 .viewer:fullscreen {
   inset: 0;
 }
+.viewer.borderless {
+  inset: 0;
+}
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1056,7 +1059,6 @@ body.col-resizing .sidebar {
   overflow: auto;
   background: #0c0d0f;
   cursor: grab;
-  scroll-behavior: smooth;
 }
 .manga-strip.grabbing {
   cursor: grabbing;

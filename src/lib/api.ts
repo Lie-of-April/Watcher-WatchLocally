@@ -25,6 +25,9 @@ export const api = {
     close: () => call<boolean>(raw.win.close()),
     isMaximized: () => call<boolean>(raw.win.isMaximized()),
     toggleFullscreen: () => call<boolean>(raw.win.toggleFullscreen()),
+    setMinSize: (width: number, height: number) => call<boolean>(raw.win.setMinSize(width, height)),
+    getSize: () => call<{ width: number; height: number }>(raw.win.getSize()),
+    setSize: (width: number, height: number) => call<boolean>(raw.win.setSize(width, height)),
     onState: (cb: (s: any) => void) => raw.win.onState(cb)
   },
   fs: {

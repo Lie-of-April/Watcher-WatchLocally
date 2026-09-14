@@ -14,6 +14,7 @@ import {
 import { useApp } from '@/store/AppContext'
 import { MangaStrip } from './MangaStrip'
 import {
+  IconBorderless,
   IconChevronLeft,
   IconChevronRight,
   IconFolderOpen,
@@ -174,7 +175,9 @@ export function Viewer({ onContext }: { onContext?: (e: Entry, ev: React.MouseEv
     promptState,
     settings,
     patchSettings,
-    viewerQueueName
+    viewerQueueName,
+    viewerBorderless,
+    setViewerBorderless
   } = useApp()
 
   const entry: Entry | null = viewerIndex == null ? null : viewerList[viewerIndex] || null
@@ -281,9 +284,10 @@ export function Viewer({ onContext }: { onContext?: (e: Entry, ev: React.MouseEv
   }, [entry?.path])
 
   /* 漫画模式页宽只在切换「不同套图」时归位，套图内翻页（entry?.path 变但 albumPath 不变）保持统一，
-     这样滚动到新图片不会丢失缩放 */
+     这样滚动到新图片不会丢失缩放。无边框模式同理，只在套图切换时重置。 */
   useEffect(() => {
     setMangaZoom(100)
+    setViewerBorderless(false)
   }, [entry?.albumPath])
 
   /* 套图：进入时按记忆恢复阅读模式（横向 / 漫画）。漫画模式额外恢复到上次读到的页码。
@@ -311,6 +315,59 @@ export function Viewer({ onContext }: { onContext?: (e: Entry, ev: React.MouseEv
     patchSettings({ albumReadMode: { ...(settingsRef.current.albumReadMode || {}), [ap]: readMode } })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readMode, entry?.albumPath])
+
+  /* 无边框模式：解除窗口最小宽度限制，方便窄屏阅读；退出时恢复尺寸和限制 */
+  const borderlessSizeRef = useRef<{ width: number; height: number } | null>(null)
+  const isBorderlessRef = useRef(false)
+  useEffect(() => {
+    isBorderlessRef.current = viewerBorderless
+    if (viewerBorderless) {
+      // 进入无边框模式：记忆当前窗口尺寸，解除最小限制，然后应用上次无边框的尺寸
+      ;(async () => {
+        try {
+          const size = await api.win.getSize()
+          borderlessSizeRef.current = size
+          await api.win.setMinSize(0, 0)
+          // 继承上次无边框模式的窗口尺寸
+          const saved = localStorage.getItem('watcher.borderlessSize')
+          if (saved) {
+            const { width, height } = JSON.parse(saved)
+            if (width > 0 && height > 0) {
+              await api.win.setSize(width, height)
+            }
+          }
+        } catch {}
+      })()
+    } else {
+      // 退出无边框模式：保存当前无边框尺寸供下次继承，然后恢复窗口
+      ;(async () => {
+        try {
+          const size = await api.win.getSize()
+          localStorage.setItem('watcher.borderlessSize', JSON.stringify(size))
+          await api.win.setMinSize(940, 600)
+          if (borderlessSizeRef.current) {
+            const { width, height } = borderlessSizeRef.current
+            await api.win.setSize(width, height)
+            borderlessSizeRef.current = null
+          }
+        } catch {}
+      })()
+    }
+  }, [viewerBorderless])
+
+  /* 查看器关闭时：如果还在无边框模式，恢复窗口尺寸和限制 */
+  useEffect(() => {
+    return () => {
+      if (isBorderlessRef.current) {
+        api.win.setMinSize(940, 600).catch(() => {})
+        if (borderlessSizeRef.current) {
+          const { width, height } = borderlessSizeRef.current
+          api.win.setSize(width, height).catch(() => {})
+          borderlessSizeRef.current = null
+        }
+      }
+    }
+  }, [])
 
   /* 套图：漫画模式下实时记忆阅读进度（当前页码），下次以漫画模式打开自动恢复到这一页 */
   useEffect(() => {
@@ -699,6 +756,14 @@ export function Viewer({ onContext }: { onContext?: (e: Entry, ev: React.MouseEv
             e.preventDefault()
             setViewerIndex(viewerList.length - 1)
             return
+          case 'Escape':
+            e.preventDefault()
+            if (viewerBorderless) {
+              setViewerBorderless(false)
+            } else {
+              closeViewer()
+            }
+            return
           default:
             break
         }
@@ -788,7 +853,9 @@ export function Viewer({ onContext }: { onContext?: (e: Entry, ev: React.MouseEv
     zoomTo,
     resetZoom,
     readMode,
-    scrollManga
+    scrollManga,
+    viewerBorderless,
+    setViewerBorderless
   ])
 
   /* 空格平移（仅图片）：按住平移，轻点下一张 */
@@ -1167,7 +1234,7 @@ export function Viewer({ onContext }: { onContext?: (e: Entry, ev: React.MouseEv
 
   return (
     <div
-      className="viewer"
+      className={'viewer' + (viewerBorderless ? ' borderless' : '')}
       ref={viewerRootRef}
       onContextMenu={(e) => {
         const t = e.target as HTMLElement | null
@@ -1175,6 +1242,7 @@ export function Viewer({ onContext }: { onContext?: (e: Entry, ev: React.MouseEv
         if (onContext && entry) onContext(entry, e)
       }}
     >
+      {!viewerBorderless && (
       <div className="viewer-top">
         <span className="v-title" title={entry.path}>
           {viewerQueueName && (
@@ -1236,9 +1304,21 @@ export function Viewer({ onContext }: { onContext?: (e: Entry, ev: React.MouseEv
             <button
               className={'v-btn' + (readMode === 'manga' ? ' on' : '')}
               title={readMode === 'manga' ? t('viewer.horizMode') : t('viewer.mangaMode')}
-              onClick={() => setReadMode((m) => (m === 'manga' ? 'horizontal' : 'manga'))}
+              onClick={() => {
+                setReadMode((m) => (m === 'manga' ? 'horizontal' : 'manga'))
+                if (readMode !== 'manga') setViewerBorderless(false)
+              }}
             >
               <IconManga />
+            </button>
+          )}
+          {readMode === 'manga' && (
+            <button
+              className={'v-btn' + (viewerBorderless ? ' on' : '')}
+              title={t('viewer.borderless')}
+              onClick={() => setViewerBorderless(!viewerBorderless)}
+            >
+              <IconBorderless />
             </button>
           )}
           <button
@@ -1263,6 +1343,7 @@ export function Viewer({ onContext }: { onContext?: (e: Entry, ev: React.MouseEv
           </button>
         </div>
       </div>
+      )}
 
       <div
         className={'viewer-stage' + (spaceMode ? ' space' : '')}
@@ -1432,7 +1513,7 @@ export function Viewer({ onContext }: { onContext?: (e: Entry, ev: React.MouseEv
         </aside>
       )}
 
-      {(readMode !== 'manga' || showFilm) && (
+      {!viewerBorderless && (readMode !== 'manga' || showFilm) && (
         <div className="viewer-filmstrip" ref={filmRef}>
           {film.map((e, i) => {
             const idx = from + i

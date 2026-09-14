@@ -262,3 +262,9 @@ export const IconQueue = mk(
     <path d="M19 9v9M19 18a2 2 0 1 0 2-2" />
   </>
 )
+export const IconBorderless = mk(
+  <>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9h18" />
+  </>
+)

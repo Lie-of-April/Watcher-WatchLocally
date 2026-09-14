@@ -117,6 +117,8 @@ interface Ctx {
   setViewerIndex: (i: number | null) => void
   viewerList: Entry[]
   viewerQueueName: string | null
+  viewerBorderless: boolean
+  setViewerBorderless: (v: boolean) => void
 
   /** 瀑布流实际呈现的条目：普通媒体 + 套图封面，套图在父目录里以大图封面呈现 */
   streamEntries: Entry[]
@@ -228,6 +230,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS)
   const [selection, setSelection] = useState<Set<string>>(new Set())
   const [viewerIndex, setViewerIndex] = useState<number | null>(null)
+  const [viewerBorderless, setViewerBorderless] = useState(false)
   const [toasts, setToasts] = useState<Toast[]>([])
   const [confirmState, setConfirmState] = useState<any>(null)
   const [promptState, setPromptState] = useState<any>(null)
@@ -1156,6 +1159,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     selection, isSelected, toggleSelect, selectRange, selectOnly, selectPaths, selectAll,
     clearSelection, selectedEntries,
     viewerIndex, openViewer, closeViewer, setViewerIndex, viewerList, viewerQueueName,
+    viewerBorderless, setViewerBorderless,
     streamEntries, albumEntries, albumShown, openAlbum, setFolderView, setFoldersAlbum,
     playlists, loadPlaylists, startPlaylist, addToPlaylist,
     toasts, toast, confirm, prompt, confirmState, promptState,

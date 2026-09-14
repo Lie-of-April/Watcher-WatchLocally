@@ -55,6 +55,24 @@ function registerIpc({ store, db, getWindow }) {
     w.setFullScreen(!w.isFullScreen())
     return w.isFullScreen()
   })
+  H('win:setMinSize', ({ width, height }) => {
+    const w = getWindow()
+    if (!w) return false
+    w.setMinimumSize(width || 0, height || 0)
+    return true
+  })
+  H('win:getSize', () => {
+    const w = getWindow()
+    if (!w) return { width: 0, height: 0 }
+    const [width, height] = w.getSize()
+    return { width, height }
+  })
+  H('win:setSize', ({ width, height }) => {
+    const w = getWindow()
+    if (!w) return false
+    w.setSize(width, height)
+    return true
+  })
 
   /* ---------------- 文件系统 ---------------- */
   H('fs:listDir', ({ dirPath, opts }) => fsops.listDir(dirPath, opts))

@@ -31,7 +31,8 @@ export function App() {
     itemMeta, folderMeta, tagMap, applyMetaPatch,
     doToggleFavorite, doRename, doTrash, doMove, doCopy, doSetCover,
     addRoot, toasts, toast, settings, patchSettings, reloadTags,
-    openAlbum, setFolderView, setFoldersAlbum, streamEntries, albumShown
+    openAlbum, setFolderView, setFoldersAlbum, streamEntries, albumShown,
+    viewerBorderless
   } = app
 
   const onToggleFav = doToggleFavorite
@@ -587,7 +588,7 @@ export function App() {
 
   return (
     <div className="app">
-      <TitleBar />
+      {!viewerBorderless && <TitleBar />}
       <div className="app-body">
         {!sidebarCollapsed && (
           <div className="sidebar-pane" style={{ width: sidebarWidth }}>
