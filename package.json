@@ -61,5 +61,10 @@
       "runAfterFinish": false,
       "warningsAsErrors": false
     }
+  },
+  "allowScripts": {
+    "electron@33.4.11": true,
+    "esbuild@0.21.5": true,
+    "electron-winstaller@5.4.0": true
   }
 }
